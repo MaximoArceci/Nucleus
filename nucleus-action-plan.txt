@@ -1,0 +1,28 @@
+Nucleus action plan
+
+1. Configure local environment
+- Create a local .env from .env.example.
+- Use DATABASE_NAME=nucleus.
+- Keep real secrets out of Git.
+- Add backend startup validation for required environment variables.
+
+2. Restore external connections
+- Configure MongoDB for the nucleus database.
+- Create a Google Cloud OAuth client for Nucleus.
+- Store backend/config/credentials.json locally only.
+- Replace old 45Minutes callback and redirect URLs with environment variables.
+
+3. Adapt the domain
+- Replace therapy-specific users with Nucleus members.
+- Introduce teams, roles, meetings, contacts, projects, tasks, and documents.
+- Disable or remove payments from the MVP unless needed.
+
+4. Reuse existing modules
+- Reuse the calendar and Google Meet integration for organizational meetings.
+- Reuse the contact list as the base for the internal CRM.
+- Reuse the existing drag-and-drop dependencies for Kanban.
+
+5. Security cleanup
+- Remove frontend logs that print environment variables.
+- Move SMTP server, user, and password to environment variables.
+- Keep .env and Google credential JSON files ignored.

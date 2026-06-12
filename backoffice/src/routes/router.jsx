@@ -1,0 +1,95 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { lazy, Suspense, useState, useEffect } from "react";
+
+import Login from "views/pages/authentication/authentication3/Login3";
+import Navbar from "menu-items/Navigation";
+import Paciente from "views/application/crm/ContactManagement/ContactList/index";
+import { useAuth } from "contexts/Auth0Context"; // Asegurate que esté retornando: { id, role, loading, isAuthenticated }
+import PaymentScreen from "views/application/payment/PaymentScreen";
+import Landing from "views/pages/Landing/pages/Landing";
+
+// Lazy load components
+const Calendar = lazy(() => import("views/application/calendar/index"));
+const Loader = lazy(() => import("ui-component/Loader"));
+const Header = lazy(() => import("ui-component/Header"));
+import Detas from "views/pages/Landing/pages/components/Detas"
+import Terms from "views/pages/Landing/pages/components/Terms"
+
+const AppRouter = () => {
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+  const { isLoading, isProcessingAuth, isAuthenticated, role } = useAuth();
+  const toggleNavbar = () => setIsNavbarVisible((prev) => !prev);
+
+  
+  useEffect(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 500);
+  }, [isNavbarVisible]);
+  // 🔎 Detecta si vienen params de auth (ajusta si tu backend manda otros)
+  const search = new URLSearchParams(location.search);
+  const hasAuthParams =
+    !!search.get("email") || !!search.get("name") || !!search.get("picture");
+
+  // Mientras esté procesando auth o haya params de auth, bloqueo todo con Loader
+  console.log(isProcessingAuth);
+  if (isLoading || isProcessingAuth) return <Loader />;
+
+  // 🔐 Si no está autenticado, redirige todo excepto /login y /
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/politica" element={<Detas />} />
+        <Route path="/terminos" element={<Terms />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Suspense fallback={<Loader />}>
+      <Routes>
+      <Route path="/politica" element={<Detas />} />
+      <Route path="/terminos" element={<Terms />} />
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/*"
+          element={
+            <>
+              <Header toggleNavbar={toggleNavbar} />
+              <div className="app-container min-h-screen bg-primary flex">
+                <div className={`sidebar ${isNavbarVisible ? "" : ""} rounded-xl`}>
+                  <Navbar toggleNavbar={isNavbarVisible} />
+                </div>
+
+                <div
+                  className={`content ${isNavbarVisible ? "expanded" : "collapsed"} 
+                    p-6 rounded-tl-xl transition-all duration-300 flex-1 pt-10`}
+                >
+                  <Routes>
+                    <Route path="/home" element={<Calendar />} />
+                    <Route path="/pagos" element={<PaymentScreen />} />
+                    {role === "Admin" && (
+                      <>
+                        <Route path="/terapeuta" element={<Paciente />} />
+                        <Route path="/candidato" element={<Paciente />} />
+                      </>
+                    )}
+                    {(role === "Admin" || role === "Terapeuta") && (
+                      <Route path="/paciente" element={<Paciente />} />
+                    )}
+                    <Route path="*" element={<Navigate to="/home" replace />} />
+                  </Routes>
+                </div>
+              </div>
+            </>
+          }
+        />
+      </Routes>
+    </Suspense>
+  );
+};
+
+export default AppRouter;

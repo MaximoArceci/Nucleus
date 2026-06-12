@@ -1,0 +1,48 @@
+from datos_microservice.aplication import app as datos_MSApp
+from reuniones_microservice.aplication import app as reuniones_MSApp
+from pago_microservice.aplication import app as pago_MSApp
+import CORS_config
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from db.database import get_database
+from main_constants import TEST
+from dotenv import load_dotenv
+load_dotenv()  # Inicializa las variables de entorno
+
+main_app = FastAPI(
+    title="45Minutes API",
+    version="0.1",
+    debug=TEST,
+)
+
+
+main_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_config.origins,
+    allow_methods=CORS_config.methods,
+    allow_headers=CORS_config.headers,
+    allow_credentials=True,
+    expose_headers=["*"]
+)
+
+main_app.mount("/datos", datos_MSApp)
+main_app.mount("/reuniones", reuniones_MSApp)
+main_app.mount("/pagos", pago_MSApp)
+
+@main_app.get("/")
+async def root():
+    return RedirectResponse(url="/docs")
+
+
+@main_app.get("/datos")
+async def root():
+    return RedirectResponse(url="/datos/docs")
+
+@main_app.get("/reuniones")
+async def root():
+    return RedirectResponse(url="/reuniones/docs")
+
+@main_app.get("/pagos")
+async def root():
+    return RedirectResponse(url="/pagos/docs")

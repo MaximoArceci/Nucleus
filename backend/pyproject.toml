@@ -1,0 +1,50 @@
+[project]
+name = "45-minutes-online"
+version = "0.1.1"
+description = "API para 45minutes online"
+authors = [
+	{ name = "Tiziano Musca"},
+]
+requires-python = ">=3.11"
+
+dependencies = [
+	"pydantic==2.3.0",
+	"fastapi==0.100.0",
+	"uvicorn[standard]==0.23.1",
+	"httpx==0.24.1",
+	"motor==3.3.1",
+	"pymongo==4.5.0",
+	"PyJWT==2.7.0",
+	"cryptography==41.0.4",
+	"pydantic-geojson==0.1.1",
+	"typer==0.12.3",
+	"python-jose==3.3.0",
+	"pydantic[email]==2.3.0",
+	"requests==2.32.3",
+	"google-auth==2.38.0",
+	"google-api-python-client==2.166.0",
+	"pytz==2025.1",
+	"stripe==11.6.0",
+	"google-apps-meet==0.1.15",
+	"google_auth_oauthlib==1.2.1",
+	"google-auth-httplib2==0.2.0",
+]
+
+[project.optional-dependencies]
+dev = []
+test = [
+	"pytest==7.4.0",
+	"pytest-asyncio==0.21.0",
+	"pytest-bdd==6.1.1",
+	"asgi-lifespan==2.1.0",
+]
+ci = [
+	"pytest==7.4.0",
+	"pytest-asyncio==0.21.0",
+	"pytest-bdd==6.1.1",
+	"pytest-cov==4.1.0",
+	"asgi-lifespan==2.1.0",	
+]
+
+[tool.setuptools]
+py-modules = []

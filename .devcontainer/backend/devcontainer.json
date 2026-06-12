@@ -1,0 +1,20 @@
+{
+	"name": "📡 Backend",
+	"dockerComposeFile": ["../../compose.yml"],
+	"workspaceFolder": "/app",
+	"service": "backend",
+	"overrideCommand": true,
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"GitHub.copilot",
+				"angus-mcritchie.custom-commands",
+				"mongodb.mongodb-vscode",
+				"usernamehw.errorlens",
+				"Gruntfuggly.todo-tree"
+			]
+		}
+	},
+	"postCreateCommand": "pip install .[dev,test,ci]"
+}

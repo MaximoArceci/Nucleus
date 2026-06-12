@@ -1,0 +1,19 @@
+{
+	"name": "🖥️ Backoffice Frontend",
+	"dockerComposeFile": ["../../compose.yml"],
+	"workspaceFolder": "/app",
+	"service": "backoffice",
+	"overrideCommand": true,
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"svelte.svelte-vscode",
+				"bradlc.vscode-tailwindcss",
+				"firefox-devtools.vscode-firefox-debug",
+				"GitHub.copilot",
+				"ms-playwright.playwright"
+			]
+		}
+	},
+	"postCreateCommand": "npm install"
+}

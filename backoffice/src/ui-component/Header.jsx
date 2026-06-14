@@ -15,7 +15,7 @@ const Header = ({ toggleNavbar }) => {
 
 
   return (
-    <div className="bg-[#5a82e5] text-white flex items-center justify-between px-6 py-3 relative">
+    <div className="bg-secondary text-white flex items-center justify-between px-6 py-3 relative">
       {/* Logo */}
       <Link className="absolute top-0 left-[5.5rem] items-center z-50 hidden md:block" to="/">
         <Logo className="h-10" />
@@ -28,12 +28,12 @@ const Header = ({ toggleNavbar }) => {
       <div className="relative">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center space-x-3 hover:bg-blue-600 px-4 rounded-lg transition duration-300"
+          className="flex items-center space-x-3 hover:bg-accent px-4 rounded-lg transition duration-300"
         >
           <div className="flex flex-col items-start">
             <p className="text-sm font-medium">Bienvenido, {userName}</p>
             {role === "Paciente" && (
-              <span className="bg-white text-blue-600 text-xs font-semibold px-2 py-1 rounded-full shadow-sm mt-1">
+              <span className="bg-white text-secondary text-xs font-semibold px-2 py-1 rounded-full shadow-sm mt-1">
                 {fichas} ficha{fichas !== 1 && "s"}
               </span>
             )}

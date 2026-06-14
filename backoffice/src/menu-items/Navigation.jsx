@@ -11,7 +11,7 @@ function Navbar({ toggleNavbar }) {
   const [isBaseDeDatosOpen, setIsBaseDeDatosOpen] = useState(false);
   return (
     <div
-      className={`z-50 min-h-full bg-primary ${toggleNavbar ? "w-[4rem]" : "w-56"
+      className={`z-50 min-h-full bg-secondary ${toggleNavbar ? "w-[4rem]" : "w-56"
         } pt-10 text-white transition-all duration-300 flex flex-col items-center`}
     >
         <ul className={`text-texto font-[500] space-y-4 pt-8 w-full ${!toggleNavbar && 'px-2'}`}>
@@ -60,7 +60,7 @@ function Navbar({ toggleNavbar }) {
 
             {/* Submenú en hover cuando está retraída */}
             {isBaseDeDatosOpen && toggleNavbar && (
-              <ol className="absolute left-16 top-0 bg-primary p-2 rounded-md shadow-2xl space-y-2 min-w-[10rem] z-[1001] list-disc">
+              <ol className="absolute left-16 top-0 bg-secondary p-2 rounded-md shadow-2xl space-y-2 min-w-[10rem] z-[1001] list-disc">
                 <div className="ml-5">
                   <li className="p-2 hover:bg-hovercolor">
                     <Link to="/usuarios">Usuarios</Link>

@@ -56,3 +56,4 @@ typings/
 */playwright/.auth
 backoffice/node_modules
 backoffice/.env
+frontend-KANBAN/

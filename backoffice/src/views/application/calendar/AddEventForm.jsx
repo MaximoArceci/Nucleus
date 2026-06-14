@@ -115,7 +115,7 @@ const getInitialValues = (event, range) => {
         link: '',
         title: '',
         description: '',
-        color: '#5a82e5',
+        color: '#7CB3E9',
         textColor: '',
         allDay: false,
         start,

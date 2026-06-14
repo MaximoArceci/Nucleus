@@ -99,7 +99,7 @@ function Products({isSmallScreen}) {
                     </div>
                     <button
                       onClick={() => handleReadMore(product.id)}
-                      className="text-right w-full hover:text-blue-600 py-2 text-black rounded"
+                      className="text-right w-full hover:text-secondary py-2 text-black rounded"
                     >
                       Leer más
                     </button>

@@ -3,6 +3,7 @@ import asyncio
 from ..services.administrador_service import AdministradorService
 from ..services.terapeuta_service import TerapeutaService
 from ..services.paciente_service import PacienteService
+from ..services.voluntario_service import VoluntarioService
 
 
 class LoginRouter(ModelRouter):
@@ -18,14 +19,18 @@ class LoginRouter(ModelRouter):
             administradorS = AdministradorService()
             pacienteS = PacienteService()
             terapeutaS = TerapeutaService()
+            voluntarioS = VoluntarioService()
 
-            admin, tera, paci = await asyncio.gather(
+            admin, tera, paci, voluntario = await asyncio.gather(
                 administradorS.find_one({"email": email}),
                 terapeutaS.find_one({"email": email}),
-                pacienteS.find_one({"email": email})
+                pacienteS.find_one({"email": email}),
+                voluntarioS.find_one({"email": email})
             )
             if admin:
                 return await administradorS.login(email)
+            elif voluntario:
+                return await voluntarioS.login(email)
             elif paci:
                 return await pacienteS.login(email)
             elif tera:

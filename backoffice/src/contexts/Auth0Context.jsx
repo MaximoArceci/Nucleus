@@ -48,14 +48,13 @@ export const Auth0Provider = ({ children }) => {
   // Registro -> loguea y entra a /home
   const registerNewUser = async ({ email, name, picture, token }) => {
     const res = await axios.post(
-      "/datos/candidato/",
+      "/datos/voluntario/",
       {
         username: name,
         email,
-        abonaReunion: false,
-        role: "Candidato",
+        areaIds: [],
+        role: "Volunteer",
         imagen: picture,
-        tipoFicha: "Inicial"
       },
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
     );
@@ -109,7 +108,7 @@ export const Auth0Provider = ({ children }) => {
 
       let res;
       try {
-        res = await axios.get(`/datos/candidato/check_register/${encodeURIComponent(email)}`, { headers });
+        res = await axios.get(`/datos/voluntario/check_register/${encodeURIComponent(email)}`, { headers });
       } catch (err) {
         // 410 -> no existe: registrar y entrar
         if (err?.response?.status === 410 && email && name && picture) {

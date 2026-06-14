@@ -27,6 +27,8 @@ class ModuleService:
             return ValueError("Error parsing data")
 
     async def get_multiple(self, search=None, limit=0, skip=0):
+        if search is None:
+            search = {}
         cursor = self.collection.find(filter=search).skip(skip).limit(limit)
 
         async def format(data):

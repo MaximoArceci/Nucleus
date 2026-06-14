@@ -1,6 +1,7 @@
 from datos_microservice.aplication import app as datos_MSApp
 from reuniones_microservice.aplication import app as reuniones_MSApp
 from pago_microservice.aplication import app as pago_MSApp
+from kanban_microservice.aplication import app as kanban_MSApp
 import CORS_config
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
@@ -29,6 +30,7 @@ main_app.add_middleware(
 main_app.mount("/datos", datos_MSApp)
 main_app.mount("/reuniones", reuniones_MSApp)
 main_app.mount("/pagos", pago_MSApp)
+main_app.mount("/kanban", kanban_MSApp)
 
 @main_app.get("/")
 async def root():
@@ -46,3 +48,7 @@ async def root():
 @main_app.get("/pagos")
 async def root():
     return RedirectResponse(url="/pagos/docs")
+
+@main_app.get("/kanban")
+async def root():
+    return RedirectResponse(url="/kanban/docs")

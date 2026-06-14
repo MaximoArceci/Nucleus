@@ -20,6 +20,9 @@ class GoogleCalendarManager:
         self.collection = self.db["tokens"]
 
     async def create_event(self, email_usuario, model, codigoMeet, attendee):
+        return await self.create_event_with_attendees(email_usuario, model, codigoMeet, [attendee] if attendee else [])
+
+    async def create_event_with_attendees(self, email_usuario, model, codigoMeet, attendees):
         try:
             token_data = self.collection.find_one({"email": email_usuario})
             if not token_data:
@@ -58,7 +61,7 @@ class GoogleCalendarManager:
                 "description": model.description + " \nLink de reunion: " + codigoMeet,
                 "start": {"dateTime": start_time.isoformat() + "Z", "timeZone": "UTC"},
                 "end": {"dateTime": end_time.isoformat() + "Z", "timeZone": "UTC"},
-                "attendees": [{"email": attendee}],
+                "attendees": [{"email": attendee} for attendee in attendees],
             }
 
             print(json.dumps(reunion, indent=4))

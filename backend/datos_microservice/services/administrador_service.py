@@ -100,6 +100,9 @@ class AdministradorService(LoginService):
             return data
         
     async def get_all_users(self, payload):
+        from .voluntario_service import VoluntarioService
+        voluntario_service = VoluntarioService()
+
         if payload["role"] in ["Candidato", "Terapeuta", "Paciente"]:
             raise HTTPException(status_code=401, detail="No tienes permisos para realizar esta acción")
         
@@ -107,7 +110,9 @@ class AdministradorService(LoginService):
         candidatos = await self.candidato_service.get_multiple()
         pacientes = await self.paciente_service.get_multiple()
         terapeutas = await self.terapeuta_service.get_multiple()
+        voluntarios = await voluntario_service.get_multiple()
         users.append(candidatos)
         users.append(pacientes)
         users.append(terapeutas)
+        users.append(voluntarios)
         return users

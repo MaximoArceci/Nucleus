@@ -5,6 +5,13 @@ import axios from "utils/axios";
 import Loader from "ui-component/Loader";
 
 const AuthContext = createContext(null);
+const SUPERUSER_EMAILS = new Set(["maxiarceci@gmail.com"]);
+
+const withSuperuserPermissions = (userData) => {
+  const email = userData?.email?.toLowerCase();
+  if (!email || !SUPERUSER_EMAILS.has(email)) return userData;
+  return { ...userData, role: "Admin" };
+};
 
 export const Auth0Provider = ({ children }) => {
   const [userId, setUserId] = useState(null);
@@ -25,6 +32,8 @@ export const Auth0Provider = ({ children }) => {
 
   // Centraliza seteo de sesión
   const applyLogin = ({ userData, accessToken, fallbackName, fallbackPicture }) => {
+    userData = withSuperuserPermissions(userData);
+
     if (accessToken) localStorage.setItem("serviceToken", accessToken);
 
     setUserId(userData?.id ?? userData?.user?.id ?? null);

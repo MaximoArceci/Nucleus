@@ -52,7 +52,7 @@ function Navbar({ toggleNavbar }) {
                   className={`overflow-hidden transition-all duration-300 ${toggleNavbar ? "hidden" : "min-w-fit opacity-100 ml-4"
                     }`}
                 >
-                  Usuarios
+                  Gestion
                 </span>
                 {!toggleNavbar && <ExpandMoreIcon className="ml-auto" />}
               </div>
@@ -63,13 +63,10 @@ function Navbar({ toggleNavbar }) {
               <ol className="absolute left-16 top-0 bg-primary p-2 rounded-md shadow-2xl space-y-2 min-w-[10rem] z-[1001] list-disc">
                 <div className="ml-5">
                   <li className="p-2 hover:bg-hovercolor">
-                    <Link to="/terapeuta">Terapeuta</Link>
+                    <Link to="/usuarios">Usuarios</Link>
                   </li>
                   <li className="p-2 hover:bg-hovercolor">
-                    <Link to="/paciente">Paciente</Link>
-                  </li>
-                  <li className="p-2 hover:bg-hovercolor">
-                    <Link to="/candidato">Candidato</Link>
+                    <Link to="/areas">Areas</Link>
                   </li>
                 </div>
               </ol>
@@ -79,13 +76,10 @@ function Navbar({ toggleNavbar }) {
             {isBaseDeDatosOpen && !toggleNavbar && (
               <ol className="text-left space-y-3 pl-10 transition-all duration-300 pt-5 list-disc">
                 <li className="submenu-item big-buttons p-2 w-full">
-                  <Link to="/terapeuta">Terapeuta</Link>
+                  <Link to="/usuarios">Usuarios</Link>
                 </li>
                 <li className="submenu-item big-buttons p-2 w-full">
-                  <Link to="/paciente">Paciente</Link>
-                </li>
-                <li className="submenu-item big-buttons p-2 w-full">
-                  <Link to="/candidato">Candidato</Link>
+                  <Link to="/areas">Areas</Link>
                 </li>
               </ol>
             )}

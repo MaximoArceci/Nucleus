@@ -3,7 +3,7 @@ import React, { lazy, Suspense, useState, useEffect } from "react";
 
 import Login from "views/pages/authentication/authentication3/Login3";
 import Navbar from "menu-items/Navigation";
-import Paciente from "views/application/crm/ContactManagement/ContactList/index";
+import UsersAreasManagement from "views/application/crm/ContactManagement/ContactList/index";
 import { useAuth } from "contexts/Auth0Context"; // Asegurate que esté retornando: { id, role, loading, isAuthenticated }
 import Landing from "views/pages/Landing/pages/Landing";
 
@@ -69,9 +69,11 @@ const AppRouter = () => {
                 >
                   <Routes>
                     <Route path="/home" element={<Calendar />} />
-                    <Route path="/terapeuta" element={<Paciente />} />
-                    <Route path="/candidato" element={<Paciente />} />
-                    <Route path="/paciente" element={<Paciente />} />
+                    <Route path="/usuarios" element={<UsersAreasManagement />} />
+                    <Route path="/areas" element={<UsersAreasManagement />} />
+                    <Route path="/terapeuta" element={<Navigate to="/usuarios" replace />} />
+                    <Route path="/candidato" element={<Navigate to="/usuarios" replace />} />
+                    <Route path="/paciente" element={<Navigate to="/usuarios" replace />} />
                     <Route path="*" element={<Navigate to="/home" replace />} />
                   </Routes>
                 </div>

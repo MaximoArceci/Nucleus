@@ -6,6 +6,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import StorageIcon from "@mui/icons-material/Storage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
+import ArticleIcon from "@mui/icons-material/Article";
 
 function Navbar({ toggleNavbar }) {
   const location = useLocation();
@@ -50,6 +51,25 @@ function Navbar({ toggleNavbar }) {
                     }`}
                 >
                   Kanban
+                </span>
+              </div>
+            </Link>
+          </li>
+
+          <li className="mb-4 nav-menu">
+            <Link
+              to={"/docs"}
+              className={`flex items-center    ${toggleNavbar ? "w-[4rem] justify-center" : "w-52 justify-left"
+                } ${location.pathname === "/docs" && "bg-hovercolor"
+                }`}
+            >
+              <div className="flex items-center justify-center ">
+                <ArticleIcon className="min-w-max" />
+                <span
+                  className={`overflow-hidden transition-all duration-300 ${toggleNavbar ? "hidden" : "max-w-full opacity-100 ml-4"
+                    }`}
+                >
+                  Docs
                 </span>
               </div>
             </Link>

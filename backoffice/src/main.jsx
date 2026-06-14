@@ -14,7 +14,6 @@ import { Box, CircularProgress } from "@mui/material";
 import { useAuth } from "./contexts/Auth0Context.jsx";
 
 const root = createRoot(document.getElementById("root"));
-console.log(import.meta.env.VITE_STRIPE_KEY, import.meta.env.VITE_STRIPE_SECRET_KEY);
 
 const LoadingOverlay = () => (
   <Box

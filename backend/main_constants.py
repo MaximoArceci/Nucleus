@@ -12,7 +12,3 @@ MONGO_DB_NAME = str(getenv("DATABASE_NAME"))
 
 CLIENT_ID = getenv("client_id")
 CLIENT_SECRET = getenv("client_secret")
-
-SMTP_PASSWORD = getenv("SMTP_PASSWORD")
-
-STRIPE_SECRET_KEY = getenv("STRIPE_SECRET_KEY")

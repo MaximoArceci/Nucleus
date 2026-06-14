@@ -39,8 +39,6 @@
     "@mui/x-date-pickers": "^7.27.0",
     "@reduxjs/toolkit": "^2.5.1",
     "@rollup/plugin-inject": "^5.0.5",
-    "@stripe/react-stripe-js": "^3.4.0",
-    "@stripe/stripe-js": "^6.0.0",
     "@tailwindcss/vite": "^4.0.3",
     "@types/lodash": "^4.17.15",
     "@vitejs/plugin-react": "^4.2.1",

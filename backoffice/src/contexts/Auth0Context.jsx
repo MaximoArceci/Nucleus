@@ -60,8 +60,9 @@ export const Auth0Provider = ({ children }) => {
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
     );
 
-    const userData = res.data?.user ?? res.data;
-    const accessToken = res.data?.access_token;
+    const authData = Array.isArray(res.data) ? res.data[0] : res.data;
+    const userData = authData?.user ?? authData;
+    const accessToken = authData?.access_token;
 
     applyLogin({ userData, accessToken, fallbackName: name, fallbackPicture: picture });
 

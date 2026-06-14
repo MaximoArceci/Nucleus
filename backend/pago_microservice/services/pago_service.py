@@ -5,8 +5,6 @@ from datos_microservice.services.paciente_service import PacienteService
 from datos_microservice.services.candidato_service import CandidatoService
 from fastapi import Response
 from asyncio import gather
-import stripe
-from main_constants import STRIPE_SECRET_KEY
 
 
 class PagoService(ModuleService):
@@ -115,15 +113,3 @@ class PagoService(ModuleService):
             return Response(data.args[0], 400)
         else:
             return data
-
-    async def create_payment_intent(self, data: dict):
-        try:
-            stripe.api_key = STRIPE_SECRET_KEY
-            intent = stripe.PaymentIntent.create(
-                amount=data["amount"],
-                currency="usd",
-                automatic_payment_methods={"enabled": True},
-            )
-            return {"clientSecret": intent.client_secret}
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))

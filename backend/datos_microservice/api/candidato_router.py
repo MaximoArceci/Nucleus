@@ -23,7 +23,7 @@ class CandidatoRouter(LoginRouter):
         async def update_one(id: int, model: dict, payload: str = Depends(jwt.get_current_user)):
             return await self.candidato_service.update(id, model, payload)
 
-        @self.router.post("/", response_model=self.model)
+        @self.router.post("/")
         async def create(model: self.createModel):
             return await self.candidato_service.crear(model) 
         

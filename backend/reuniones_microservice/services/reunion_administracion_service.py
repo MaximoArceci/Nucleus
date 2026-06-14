@@ -5,10 +5,6 @@ from ..models.ReunionAdministracion import ReunionAdministracion
 from .module_service import ModuleService
 from fastapi import Response
 from asyncio import gather
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from main_constants import SMTP_PASSWORD
 from datetime import datetime, timedelta
 from reuniones_microservice.utils import google_utils
 from datos_microservice.services.paciente_service import PacienteService
@@ -156,39 +152,12 @@ class ReunionAdministracionService(ModuleService):
         if payload["role"] in ["Admin"]:
             raise HTTPException(
                 status_code=401, detail="Eres administrador, no puedes solicitar reuniones con administracion")
-        try:
-            SMTP_SERVER = "pro.turbo-smtp.com"  # Servidor de TurboSMTP
-            SMTP_PORT = 465  # Usar 587 para STARTTLS o 465 para SSL
-            SMTP_USERNAME = "45minutesonline@gmail.com"  # Tu usuario de TurboSMTP
-
-            mensaje = MIMEMultipart()
-            mensaje["From"] = payload["email"]
-            mensaje["To"] = SMTP_USERNAME
-            mensaje["Subject"] = "Solicitud de reunión"
-
-            cuerpo_html = f"""
-            <html>
-                <body>
-                    <h1>Solicitud de reunión</h1>
-                    <p>El usuario con rol de {payload["role"]} con email {payload["email"]} ha solicitado una reunión con el siguiente motivo:</p>
-                    <p>{motivo}</p>
-                </body>
-            </html>
-            """
-            mensaje.attach(MIMEText(cuerpo_html, "html"))
-            # Conectarse al servidor SMTP
-            servidor = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
-            servidor.login(SMTP_USERNAME, SMTP_PASSWORD)  # Iniciar sesión
-
-            servidor.sendmail(SMTP_USERNAME, SMTP_USERNAME,
-                              mensaje.as_string())
-
-            servidor.quit()
-
-            return HTTPException(status_code=200, detail="Email enviado a administracion")
-        except Exception as e:
-            raise HTTPException(
-                status_code=400, detail="Error al enviar email a administracion")
+        return {
+            "detail": "Solicitud registrada. El envio por SMTP esta desactivado temporalmente.",
+            "motivo": motivo,
+            "solicitante": payload["email"],
+            "role": payload["role"],
+        }
 
     async def get_reuniones_by_user(self, payload):
         reuniones = await self.get_multiple()

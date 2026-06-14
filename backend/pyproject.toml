@@ -24,7 +24,6 @@ dependencies = [
 	"google-auth==2.38.0",
 	"google-api-python-client==2.166.0",
 	"pytz==2025.1",
-	"stripe==11.6.0",
 	"google-apps-meet==0.1.15",
 	"google_auth_oauthlib==1.2.1",
 	"google-auth-httplib2==0.2.0",

@@ -42,7 +42,3 @@ class PagoRouter(ModelRouter):
         @self.router.get("/{id}", response_model=self.model)
         async def get_one(id: int, payload: str = Depends(jwt.get_current_user)):
             return await self.pago_service.get_uno(id, payload)
-
-        @self.router.post("/create-payment-intent/")
-        async def create_payment_intent(model: dict):
-            return await self.pago_service.create_payment_intent(model)

@@ -10,11 +10,10 @@ class DatabaseConnection:
 
     def connect(self):
         if not self.client:
-            self.client = MongoClient(
-                host=MONGO_URI,
-                tls=True,
-                tlsAllowInvalidCertificates=True
-            )
+            kwargs = {}
+            if MONGO_URI.startswith("mongodb+srv://"):
+                kwargs = {"tls": True, "tlsAllowInvalidCertificates": True}
+            self.client = MongoClient(host=MONGO_URI, **kwargs)
             self.db = self.client[MONGO_DB_NAME]
 
     def get_database(self) -> Database:

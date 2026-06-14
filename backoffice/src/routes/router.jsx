@@ -5,7 +5,6 @@ import Login from "views/pages/authentication/authentication3/Login3";
 import Navbar from "menu-items/Navigation";
 import Paciente from "views/application/crm/ContactManagement/ContactList/index";
 import { useAuth } from "contexts/Auth0Context"; // Asegurate que esté retornando: { id, role, loading, isAuthenticated }
-import PaymentScreen from "views/application/payment/PaymentScreen";
 import Landing from "views/pages/Landing/pages/Landing";
 
 // Lazy load components
@@ -70,7 +69,6 @@ const AppRouter = () => {
                 >
                   <Routes>
                     <Route path="/home" element={<Calendar />} />
-                    <Route path="/pagos" element={<PaymentScreen />} />
                     {role === "Admin" && (
                       <>
                         <Route path="/terapeuta" element={<Paciente />} />

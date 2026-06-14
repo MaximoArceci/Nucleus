@@ -57,11 +57,15 @@ class CandidatoService(LoginService):
         return await self.update_one(id, model)
 
     async def crear(self, model):
+        existing = await self.find_one({"email": model.email})
+        if existing:
+            return await self.login(model.email)
+
         last_id = await self.get_last_id()
         event = self.model(**model.model_dump(), id=int(last_id)+1)
 
         await self.create(event.model_dump())
-        return event
+        return await self.login(event.email)
 
     async def delete(self, id, payload):
         if payload["role"] in ["Candidato", "Paciente"]:

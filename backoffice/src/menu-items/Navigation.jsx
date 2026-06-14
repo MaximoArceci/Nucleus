@@ -7,7 +7,6 @@ import { useAuth } from "contexts/Auth0Context";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import StorageIcon from "@mui/icons-material/Storage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { CreditCard } from "@mui/icons-material";
 
 function Navbar({ toggleNavbar }) {
   const location = useLocation();
@@ -102,27 +101,6 @@ function Navbar({ toggleNavbar }) {
             </li>
 
           )}
-
-          {role === "Paciente" &&
-
-
-            <Link
-              to={"/pagos"}
-              className={`flex items-center    ${toggleNavbar ? "w-[4rem] justify-center" : "w-52 justify-left"
-                } ${location.pathname === "/" && "bg-hovercolor"
-                }`}
-            >
-              <div className="flex items-center justify-center ">
-                <CreditCard className="min-w-max" />
-                <span
-                  className={`overflow-hidden transition-all duration-300 ${toggleNavbar ? "hidden" : "max-w-full opacity-100 ml-4"
-                    }`}
-                >
-                  Pagos
-                </span>
-              </div>
-            </Link>
-          }
           {/* {
             role === "Admin" &&
             <Link

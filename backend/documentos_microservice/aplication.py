@@ -1,7 +1,6 @@
 from CORS_config import origins, methods, headers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from .api import router
 
 app = FastAPI(
@@ -17,11 +16,5 @@ app.add_middleware(
     allow_credentials=True,
     expose_headers=["*"]
 )
-
-
-@app.get("/")
-async def root():
-    return RedirectResponse(url="/documentos/docs")
-
 
 app.include_router(router, tags=["Documentos"])

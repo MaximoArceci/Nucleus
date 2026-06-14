@@ -17,7 +17,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 // project imports
 import Toolbar from './Toolbar';
 import AddEventForm from './AddEventForm';
-import AddReunionForm from './AddReunionForm';
 import CalendarStyled from './CalendarStyled';
 
 import Loader from 'ui-component/Loader';
@@ -29,13 +28,43 @@ import { getEvents, addEvent, updateEvent, removeEvent } from 'store/slices/cale
 // assets
 import AddAlarmTwoToneIcon from '@mui/icons-material/AddAlarmTwoTone';
 import axios from 'utils/axios';
-import { EventAvailable } from '@mui/icons-material';
 import { Alert, Snackbar } from '@mui/material';
 import UserSelector from './UserSelector';
 
 // import { IconCalendarStats } from '@tabler/icons-react';
 
 // ==============================|| APPLICATION CALENDAR ||============================== //
+
+const isVisibleForVolunteer = (event, volunteer) => {
+    if (!event || !volunteer) return false;
+    if (event.organizerId === volunteer.id) return true;
+    if (event.participantMode === 'all') return true;
+    if (event.participantMode === 'volunteers') return (event.participantVolunteerIds || []).includes(volunteer.id);
+    if (event.participantMode === 'areas') {
+        return (event.participantAreaIds || []).some((areaId) => (volunteer.areaIds || []).includes(areaId));
+    }
+    return false;
+};
+
+const normalizeCalendarEvent = (event) => ({
+    ...event,
+    id: String(event.id),
+    title: event.title || 'Reunion',
+    start: event.start ? new Date(event.start) : undefined,
+    end: event.end ? new Date(event.end) : undefined,
+    allDay: Boolean(event.allDay),
+    backgroundColor: event.color || '#7CB3E9',
+    borderColor: event.color || '#7CB3E9',
+    textColor: event.textColor || '#ffffff',
+    extendedProps: {
+        organizerId: event.organizerId,
+        participantMode: event.participantMode,
+        participantVolunteerIds: event.participantVolunteerIds || [],
+        participantAreaIds: event.participantAreaIds || [],
+        link: event.link,
+        description: event.description
+    }
+});
 
 const Calendar = () => {
     const calendarRef = useRef(null);
@@ -45,6 +74,10 @@ const Calendar = () => {
     const [loading, setLoading] = useState(true);
     // fetch events data
     const [events, setEvents] = useState([]);
+    const [sourceEvents, setSourceEvents] = useState([]);
+    const [volunteers, setVolunteers] = useState([]);
+    const [areas, setAreas] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
     const calendarState = useSelector((state) => state.calendar);
 
     useEffect(() => {
@@ -52,8 +85,11 @@ const Calendar = () => {
     }, []);
 
     useEffect(() => {
-        setEvents(calendarState.events);
-    }, [calendarState]);
+        const nextEvents = Array.isArray(calendarState.events) ? calendarState.events : [];
+        setSourceEvents(nextEvents);
+        const visibleEvents = selectedUser ? nextEvents.filter((event) => isVisibleForVolunteer(event, selectedUser)) : nextEvents;
+        setEvents(visibleEvents.map(normalizeCalendarEvent));
+    }, [calendarState, selectedUser]);
 
 
 
@@ -116,26 +152,20 @@ const Calendar = () => {
 
 
 
-    // Dentro del componente Calendar:
-    const [pacientes, setPacientes] = useState([]);
-    const [candidatos, setCandidatos] = useState([]);
-    const [terapeutas, setTerapeutas] = useState([]);
-
     useEffect(() => {
-        const fetchPacientes = async () => {
+        const fetchDirectory = async () => {
             try {
-                const response = await axios.get("/datos/administrador/allUsers");
-                setPacientes(response.data[1]);
-                setCandidatos(response.data[0]);
-                setTerapeutas(response.data[2]);
+                const [volunteersResponse, areasResponse] = await Promise.all([
+                    axios.get('/datos/voluntario/'),
+                    axios.get('/datos/area/')
+                ]);
+                setVolunteers(Array.isArray(volunteersResponse.data) ? volunteersResponse.data : []);
+                setAreas(Array.isArray(areasResponse.data) ? areasResponse.data : []);
             } catch (error) {
             }
         };
-        fetchPacientes();
+        fetchDirectory();
     }, []);
-
-    useEffect(() => {
-    }, [pacientes]); // Solo se ejecuta cuando 'pacientes' cambie
 
 
 
@@ -215,19 +245,11 @@ const Calendar = () => {
         }
     };
     
-    const [selectedUser, setSelectedUser] = useState(null);
-
     const handleAddClick = () => {
         setIsModalOpen(true);
     };
-    const [reunionOpen, setReunionOpen] = useState(false);
-
-    const handleReunion = () => {
-        setReunionOpen(true)
-    }
     const handleModalClose = () => {
         setIsModalOpen(false);
-        setReunionOpen(false);
         setSelectedEvent(null);
         setSelectedRange(null);
     };
@@ -239,15 +261,6 @@ const Calendar = () => {
             title="Gestion de sesiones"
             secondary={
                 <div>
-                    <Button
-                        color="secondary"
-                        variant="contained"
-                        onClick={handleReunion}
-                        sx={{ mr: 1 }}
-                    >
-                        <EventAvailable />
-                        Solicitar sesion
-                    </Button>
                     <Button
                         color="secondary"
                         variant="contained"
@@ -291,7 +304,14 @@ const Calendar = () => {
             </Snackbar>
 
             <CalendarStyled>
-                <UserSelector setLoading={setLoading} setEvents={setEvents} events={events}  selectedUser={selectedUser} setSelectedUser={setSelectedUser}/>
+                <UserSelector
+                    setEvents={setEvents}
+                    events={events}
+                    sourceEvents={sourceEvents}
+                    volunteers={volunteers}
+                    selectedUser={selectedUser}
+                    setSelectedUser={setSelectedUser}
+                />
                 <Toolbar
                     date={date}
                     view={view}
@@ -332,27 +352,9 @@ const Calendar = () => {
             <Dialog maxWidth="sm" fullWidth onClose={handleModalClose} open={isModalOpen} sx={{ '& .MuiDialog-paper': { p: 0 } }}>
                 {isModalOpen && (
                     <AddEventForm
-                    selectedUser={selectedUser}
-                        pacientes={pacientes}
-                        candidatos={candidatos}
-                        terapeutas={terapeutas}
-                        openSnackbar={openSnackbar}
-                        setOpenSnackbar={setOpenSnackbar}
-                        event={selectedEvent}
-                        range={selectedRange}
-                        onCancel={handleModalClose}
-                        handleDelete={handleEventDelete}
-                        handleCreate={handleEventCreate}
-                        handleUpdate={handleUpdateEvent}
-                    />
-                )}
-            </Dialog>
-            <Dialog maxWidth="sm" fullWidth onClose={handleModalClose} open={reunionOpen} sx={{ '& .MuiDialog-paper': { p: 0 } }}>
-
-                {reunionOpen && (
-                    <AddReunionForm
-                        pacientes={pacientes}
-
+                        selectedUser={selectedUser}
+                        volunteers={volunteers}
+                        areas={areas}
                         event={selectedEvent}
                         range={selectedRange}
                         onCancel={handleModalClose}

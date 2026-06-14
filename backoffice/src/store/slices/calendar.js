@@ -39,7 +39,7 @@ const slice = createSlice({
     // REMOVE EVENT
     removeEventSuccess(state, action) {
       const eventId = action.payload;
-      state.events = state.events.filter((event) => event.id !== eventId);
+      state.events = state.events.filter((event) => String(event.id) !== String(eventId));
     },
   },
 });
@@ -52,10 +52,8 @@ export default slice.reducer;
 export function getEvents() {
   return async () => {
     try {
-      const response = await axios.get(
-        "/reuniones/reunion_inicial/reuniones_by_user"
-      );
-      dispatch(slice.actions.getEventsSuccess(response.data.events));
+      const response = await axios.get("/reuniones/reunion/reuniones_by_user");
+      dispatch(slice.actions.getEventsSuccess(response.data.events || []));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
@@ -65,13 +63,14 @@ export function getEvents() {
 export function addEvent(event) {
   return async (dispatch) => {
     try {
-      const response = await axios.post("/reuniones/reunion_inicial/", event, {
+      const response = await axios.post("/reuniones/reunion/", event, {
         headers: {
           "Cache-Control": "no-cache",
           Pragma: "no-cache",
         },
       });
-      dispatch(slice.actions.addEventSuccess(response.data));
+      const eventsResponse = await axios.get("/reuniones/reunion/reuniones_by_user");
+      dispatch(slice.actions.addEventSuccess(eventsResponse.data.events || [response.data]));
     } catch (error) {
       dispatch(
         slice.actions.hasError(
@@ -86,11 +85,9 @@ export function addEvent(event) {
 export function updateEvent(event) {
   return async (dispatch) => {
     try {
-      const response = await axios.patch(
-        `/reuniones/reunion_inicial/{id}`,
-        event
-      );
-      dispatch(slice.actions.updateEventSuccess(response.data.events));
+      await axios.patch(`/reuniones/reunion/${event.eventId}`, event.update);
+      const eventsResponse = await axios.get("/reuniones/reunion/reuniones_by_user");
+      dispatch(slice.actions.updateEventSuccess(eventsResponse.data.events || []));
     } catch (error) {
       dispatch(
         slice.actions.hasError(
@@ -105,11 +102,12 @@ export function updateEvent(event) {
 export function removeEvent(eventId, event) {
   return async (dispatch) => {
     try {
-      await axios.delete(`/reuniones/reunion_inicial/?id=${eventId}`, {
+      await axios.delete(`/reuniones/reunion/?id=${eventId}`, {
         data: event, // Enviar el evento completo
       });
 
-      dispatch(slice.actions.removeEventSuccess(eventId)); // Solo pasamos el ID al reducer
+      const eventsResponse = await axios.get("/reuniones/reunion/reuniones_by_user");
+      dispatch(slice.actions.getEventsSuccess(eventsResponse.data.events || []));
     } catch (error) {
       dispatch(
         slice.actions.hasError(

@@ -92,7 +92,7 @@ class ReunionService(ModuleService):
     async def get_todos(self, payload):
         if payload["role"] == "Admin":
             return await self.get_multiple()
-        return await self.get_reuniones_by_user(payload)
+        return (await self.get_reuniones_by_user(payload))["events"]
 
     async def get_reuniones_by_user(self, payload):
         reuniones = await self.get_multiple()

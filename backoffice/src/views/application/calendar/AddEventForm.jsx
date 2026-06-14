@@ -1,314 +1,269 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
+import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import Autocomplete from '@mui/material/Autocomplete';
 import { LocalizationProvider, MobileDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-// third-party
-import _ from 'lodash-es';
 import * as Yup from 'yup';
-import { useFormik, Form, FormikProvider } from 'formik';
-
-// project imports
-import ColorPalette from './ColorPalette';
+import { Form, FormikProvider, useFormik } from 'formik';
+import { setMilliseconds, setSeconds } from 'date-fns';
 
 import { gridSpacing } from 'store/constant';
+import { useAuth } from 'contexts/Auth0Context';
 
-// assets
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useAuth } from 'contexts/Auth0Context';
-// constant
-import { setSeconds, setMilliseconds } from 'date-fns';
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
 
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import VideoCallIcon from "@mui/icons-material/VideoCall";
-import { useState } from "react";
+const participantModes = [
+    { value: 'volunteers', label: 'Voluntarios' },
+    { value: 'areas', label: 'Areas' },
+    { value: 'all', label: 'Todos' }
+];
+
+const normalizeDate = (date) => setMilliseconds(setSeconds(new Date(date), new Date(date).getSeconds()), 0);
 
 const MeetLinkDisplay = ({ link }) => {
-  const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = useState(false);
+    if (!link) return null;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Error al copiar el enlace", err);
-    }
-  };
-
-  return (
-    <Grid item xs={12}>
-      <FormHelperText>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            backgroundColor: "#e8f0fe",
-            padding: "8px 12px",
-            borderRadius: "8px",
-            marginTop: "4px",
-          }}
-        >
-          <VideoCallIcon style={{ color: "#34a853" }} />
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: "#1a73e8",
-              textDecoration: "none",
-              fontWeight: 500,
-              fontSize: "0.95rem",
-              flexGrow: 1,
-            }}
-          >
-            Unirse a la videollamada
-          </a>
-          <Tooltip title={copied ? "¡Copiado!" : "Copiar enlace"}>
-            <IconButton size="small" onClick={handleCopy}>
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </div>
-      </FormHelperText>
-    </Grid>
-  );
-};
-
-
-const getInitialValues = (event, range) => {
-    const { userId } = useAuth();
-    let start = range ? new Date(range.start) : new Date();
-    let end = new Date(start.getTime() + 45 * 60000);
-
-    start = setMilliseconds(setSeconds(start, start.getSeconds()), 0);
-    end = setMilliseconds(setSeconds(end, end.getSeconds()), 0);
-
-    const newEvent = {
-        guestId: event?.guestId,
-        ownerId: userId,
-        tipoGuest: event?.role,
-        link: '',
-        title: '',
-        description: '',
-        color: '#7CB3E9',
-        textColor: '',
-        allDay: false,
-        start,
-        end,
+    const handleCopy = async () => {
+        await navigator.clipboard.writeText(link);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
-    if (event || range) {
-        return _.merge({}, newEvent, event);
-    }
-
-    return newEvent;
+    return (
+        <FormHelperText>
+            <Stack direction="row" alignItems="center" gap={1} sx={{ bgcolor: '#e8f0fe', px: 1.5, py: 1, borderRadius: 1, mt: 0.5 }}>
+                <VideoCallIcon sx={{ color: '#14B8A6' }} />
+                <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 500, flexGrow: 1 }}>
+                    Unirse a la videollamada
+                </a>
+                <Tooltip title={copied ? 'Copiado' : 'Copiar enlace'}>
+                    <IconButton size="small" onClick={handleCopy}>
+                        <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </Stack>
+        </FormHelperText>
+    );
 };
 
-// ==============================|| CALENDAR EVENT ADD / EDIT / DELETE ||============================== //
+const getInitialValues = (event, range, userId) => {
+    const start = normalizeDate(event?.start || range?.start || new Date());
+    const end = normalizeDate(event?.end || range?.end || new Date(start.getTime() + 45 * 60000));
 
-const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, onCancel, pacientes, terapeutas, candidatos, openSnackbar, setOpenSnackbar, selectedUser }) => {
-    const theme = useTheme();
+    return {
+        organizerId: event?.organizerId || userId || 0,
+        title: event?.title || '',
+        description: event?.description || '',
+        start,
+        end,
+        link: event?.link || '',
+        allDay: event?.allDay || false,
+        color: event?.color || '#7CB3E9',
+        textColor: event?.textColor || '#ffffff',
+        participantMode: event?.participantMode || 'volunteers',
+        participantVolunteerIds: event?.participantVolunteerIds || [],
+        participantAreaIds: event?.participantAreaIds || []
+    };
+};
+
+const AddEventForm = ({ event, range, handleDelete, handleCreate, handleUpdate, onCancel, volunteers, areas, selectedUser }) => {
+    const { userId } = useAuth();
     const isCreating = !event;
-    const [errorMessage, setErrorMessage] = useState();
+    const isReadOnly = selectedUser !== null;
+
     const EventSchema = Yup.object().shape({
-        title: Yup.string().max(255).required('Se requiere un título'),
+        title: Yup.string().max(255).required('Se requiere un titulo'),
         description: Yup.string().max(5000),
-        end: Yup.date().when('start', (start, schema) => start && schema.min(start, 'End date must be later than start date')),
-        start: Yup.date(),
-        color: Yup.string().max(255),
-        tipoGuest: Yup.string().max(255),
-        textColor: Yup.string().max(255),
-        guestId: Yup.number().integer().required('Se requiere un paciente'),
-        ownerId: Yup.number().integer(),
-        link: Yup.string().max(255),
+        start: Yup.date().required('Se requiere fecha de inicio'),
+        end: Yup.date().min(Yup.ref('start'), 'La fecha de fin debe ser posterior al inicio').required('Se requiere fecha de fin'),
+        participantMode: Yup.string().oneOf(['volunteers', 'areas', 'all']).required(),
+        participantVolunteerIds: Yup.array().when('participantMode', {
+            is: 'volunteers',
+            then: (schema) => schema.min(1, 'Selecciona al menos un voluntario'),
+            otherwise: (schema) => schema
+        }),
+        participantAreaIds: Yup.array().when('participantMode', {
+            is: 'areas',
+            then: (schema) => schema.min(1, 'Selecciona al menos un area'),
+            otherwise: (schema) => schema
+        })
     });
 
-
     const formik = useFormik({
-        initialValues: getInitialValues(event, range),
+        initialValues: getInitialValues(event, range, userId),
         validationSchema: EventSchema,
+        enableReinitialize: true,
         onSubmit: async (values, { resetForm, setSubmitting }) => {
-
-            const formatDate = (date) => {
-                return date; // Recorta hasta "YYYY-MM-DDTHH:mm"
+            const payload = {
+                organizerId: Number(values.organizerId || userId || 0),
+                title: values.title,
+                description: values.description,
+                start: values.start,
+                end: values.end,
+                link: values.link,
+                allDay: false,
+                color: values.color,
+                textColor: values.textColor || '#ffffff',
+                participantMode: values.participantMode,
+                participantVolunteerIds: values.participantMode === 'volunteers' ? values.participantVolunteerIds : [],
+                participantAreaIds: values.participantMode === 'areas' ? values.participantAreaIds : []
             };
-            try {
-                const cleanedValues = {
-                    title: values.title,
-                    description: values.description,
-                    end: formatDate(values.end),
-                    start: formatDate(values.start),
-                    color: values.color,
-                    tipoGuest: values.tipoGuest,
-                    textColor: values.textColor,
-                    guestId: values.guestId,
-                    ownerId: values.ownerId,
-                    link: values.link,
-                    allDay: false
-                };
 
+            try {
                 if (event) {
-                    await handleUpdate(event.id, cleanedValues);
+                    await handleUpdate(event.id, payload);
                 } else {
-                    await handleCreate(cleanedValues);
+                    await handleCreate(payload);
                 }
                 resetForm();
-                setOpenSnackbar(true);
-            } catch (error) {
-
             } finally {
                 setSubmitting(false);
             }
-        },
-
-    });
-    const obtenerListaPorTipo = () => {
-        switch (tipoSeleccionado) {
-            case 0:
-                return candidatos || [];
-            case 1:
-                return pacientes || [];
-            case 2:
-                return terapeutas || [];
-            default:
-                return [];
         }
-    };
+    });
 
-
-
-
-
-
-    const [tipoSeleccionado, setTipoSeleccionado] = useState(1);
     const { values, errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
-    const isDisabled = selectedUser !== null;
 
     return (
         <FormikProvider value={formik}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
-                    <DialogTitle>{event ? 'Editar Evento' : 'Agregar Evento'}</DialogTitle>
+                    <DialogTitle>{event ? 'Editar reunion' : 'Agregar reunion'}</DialogTitle>
                     <Divider />
                     <DialogContent sx={{ p: 3 }}>
                         <Grid container spacing={gridSpacing}>
-                            {/* Campo de título */}
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
-                                    label="Título"
+                                    label="Titulo"
                                     {...getFieldProps('title')}
                                     error={Boolean(touched.title && errors.title)}
                                     helperText={touched.title && errors.title}
-                                    disabled={isDisabled}
+                                    disabled={isReadOnly}
                                 />
                             </Grid>
 
-                            {/* Selección de usuario y Autocomplete */}
-                            <Grid item xs={12}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} md={6}>
-                                        <FormControl fullWidth>
-                                            <InputLabel id="tipo-usuario-label">Tipo de Usuario</InputLabel>
-                                            <Select
-                                                labelId="tipo-usuario-label"
-                                                value={tipoSeleccionado}
-                                                onChange={(event) => setTipoSeleccionado(event.target.value)}
-                                                disabled={isDisabled}
-                                            >
-                                                <MenuItem value={0}>Candidatos</MenuItem>
-                                                <MenuItem value={1}>Pacientes</MenuItem>
-                                                <MenuItem value={2}>Terapeutas</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-
-                                    <Grid item xs={12} md={6}>
-                                        <Autocomplete
-                                            options={obtenerListaPorTipo()}
-                                            getOptionLabel={(option) => option.username}
-                                            value={obtenerListaPorTipo().find((p) => p.id === values.guestId) || null}
-                                            onChange={(event, newValue) => {
-                                                setFieldValue('guestId', newValue ? newValue.id : null);
-                                                setFieldValue('tipoGuest', newValue ? newValue.role : '');
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="Seleccionar Usuario"
-                                                    error={Boolean(touched.guestId && errors.guestId)}
-                                                    helperText={touched.guestId && errors.guestId}
-                                                    disabled={isDisabled}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-
-
-                            {/* Descripción */}
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     multiline
                                     rows={3}
-                                    label="Descripción"
+                                    label="Descripcion"
                                     {...getFieldProps('description')}
                                     error={Boolean(touched.description && errors.description)}
                                     helperText={touched.description && errors.description}
-                                    disabled={isDisabled}
+                                    disabled={isReadOnly}
                                 />
                             </Grid>
 
-                            {/* Fecha y hora */}
                             <Grid item xs={12}>
+                                <FormControl fullWidth disabled={isReadOnly}>
+                                    <InputLabel id="participant-mode-label">Participantes</InputLabel>
+                                    <Select
+                                        labelId="participant-mode-label"
+                                        label="Participantes"
+                                        value={values.participantMode}
+                                        onChange={(selectEvent) => {
+                                            setFieldValue('participantMode', selectEvent.target.value);
+                                            setFieldValue('participantVolunteerIds', []);
+                                            setFieldValue('participantAreaIds', []);
+                                        }}
+                                    >
+                                        {participantModes.map((mode) => (
+                                            <MenuItem key={mode.value} value={mode.value}>
+                                                {mode.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            {values.participantMode === 'volunteers' && (
+                                <Grid item xs={12}>
+                                    <Autocomplete
+                                        multiple
+                                        options={volunteers}
+                                        getOptionLabel={(option) => option.username || option.email || `Voluntario ${option.id}`}
+                                        value={volunteers.filter((volunteer) => values.participantVolunteerIds.includes(volunteer.id))}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                        onChange={(autocompleteEvent, selected) => setFieldValue('participantVolunteerIds', selected.map((volunteer) => volunteer.id))}
+                                        disabled={isReadOnly}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Seleccionar voluntarios"
+                                                error={Boolean(touched.participantVolunteerIds && errors.participantVolunteerIds)}
+                                                helperText={touched.participantVolunteerIds && errors.participantVolunteerIds}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                            )}
+
+                            {values.participantMode === 'areas' && (
+                                <Grid item xs={12}>
+                                    <Autocomplete
+                                        multiple
+                                        options={areas}
+                                        getOptionLabel={(option) => option.name || option.slug || `Area ${option.id}`}
+                                        value={areas.filter((area) => values.participantAreaIds.includes(area.id))}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                        onChange={(autocompleteEvent, selected) => setFieldValue('participantAreaIds', selected.map((area) => area.id))}
+                                        disabled={isReadOnly}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Seleccionar areas"
+                                                error={Boolean(touched.participantAreaIds && errors.participantAreaIds)}
+                                                helperText={touched.participantAreaIds && errors.participantAreaIds}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                            )}
+
+                            <Grid item xs={12} md={6}>
                                 <MobileDateTimePicker
-                                    label="Comienzo de sesión"
+                                    label="Inicio"
                                     value={new Date(values.start)}
                                     format="dd/MM/yyyy hh:mm a"
+                                    disabled={isReadOnly}
                                     onChange={(date) => {
-                                        if (date) {
-                                            const truncatedDate = setMilliseconds(setSeconds(date, date.getSeconds()), 0);
-                                            setFieldValue('start', truncatedDate);
-
-                                            const endDate = setMilliseconds(setSeconds(new Date(truncatedDate.getTime() + 45 * 60000), 0), 0);
-                                            setFieldValue('end', endDate);
-                                        }
+                                        if (!date) return;
+                                        const nextStart = normalizeDate(date);
+                                        setFieldValue('start', nextStart);
+                                        setFieldValue('end', normalizeDate(new Date(nextStart.getTime() + 45 * 60000)));
                                     }}
-                                    fullWidth
-                                    disabled={isDisabled}
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
+                                            error: Boolean(touched.start && errors.start),
+                                            helperText: touched.start && errors.start,
                                             InputProps: {
                                                 endAdornment: (
-                                                    <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
+                                                    <InputAdornment position="end">
                                                         <DateRangeIcon />
                                                     </InputAdornment>
                                                 )
@@ -316,43 +271,45 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
                                         }
                                     }}
                                 />
-                                {touched.start && errors.start && <FormHelperText error={true}>{errors.start}</FormHelperText>}
-                            </Grid>
-                            <Grid item xs={12}>
-                                {event && (
-                                    <FormHelperText>
-                                        <MeetLinkDisplay link={values.link} />
-                                        {/* <a
-        href={values.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          color: '#1a73e8',
-          textDecoration: 'none',
-          fontWeight: 500,
-          fontSize: '0.95rem',
-          display: 'inline-block',
-          backgroundColor: '#e8f0fe',
-          padding: '6px 12px',
-          borderRadius: '8px',
-          marginTop: '4px',
-        }}
-      >
-        Unirse a la videollamada
-      </a> */}
-                                    </FormHelperText>
-                                )}
                             </Grid>
 
+                            <Grid item xs={12} md={6}>
+                                <MobileDateTimePicker
+                                    label="Fin"
+                                    value={new Date(values.end)}
+                                    format="dd/MM/yyyy hh:mm a"
+                                    disabled={isReadOnly}
+                                    onChange={(date) => date && setFieldValue('end', normalizeDate(date))}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            error: Boolean(touched.end && errors.end),
+                                            helperText: touched.end && errors.end,
+                                            InputProps: {
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <DateRangeIcon />
+                                                    </InputAdornment>
+                                                )
+                                            }
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            {event?.link && (
+                                <Grid item xs={12}>
+                                    <MeetLinkDisplay link={values.link} />
+                                </Grid>
+                            )}
                         </Grid>
                     </DialogContent>
 
-                    {/* Acciones del formulario */}
                     <DialogActions sx={{ p: 3 }}>
                         <Grid container justifyContent="space-between" alignItems="center">
                             <Grid item>
-                                {!isCreating && !isDisabled && (
-                                    <Tooltip title="Borrar sesión">
+                                {!isCreating && !isReadOnly && (
+                                    <Tooltip title="Borrar reunion">
                                         <IconButton onClick={() => handleDelete(event?.id, event)} size="large">
                                             <DeleteIcon color="error" />
                                         </IconButton>
@@ -364,9 +321,9 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
                                     <Button type="button" variant="outlined" onClick={onCancel}>
                                         Cancelar
                                     </Button>
-                                    {!isDisabled && (
+                                    {!isReadOnly && (
                                         <Button type="submit" variant="contained" disabled={isSubmitting}>
-                                            {event ? 'Editar' : 'Agregar'}
+                                            {event ? 'Guardar' : 'Agregar'}
                                         </Button>
                                     )}
                                 </Stack>
@@ -377,16 +334,18 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
             </LocalizationProvider>
         </FormikProvider>
     );
-
 };
 
-AddEventFrom.propTypes = {
+AddEventForm.propTypes = {
     event: PropTypes.object,
     range: PropTypes.object,
     handleDelete: PropTypes.func,
     handleCreate: PropTypes.func,
     handleUpdate: PropTypes.func,
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
+    volunteers: PropTypes.array,
+    areas: PropTypes.array,
+    selectedUser: PropTypes.object
 };
 
-export default AddEventFrom;
+export default AddEventForm;

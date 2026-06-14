@@ -1,102 +1,75 @@
-import { Autocomplete, TextField, Button, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { dispatch } from 'store';
-import { getEvents } from 'store/slices/calendar';
-import axios from 'utils/axios';
+import { Autocomplete, Button, Stack, TextField } from '@mui/material';
+import { useMemo } from 'react';
 
-const UserSelector = ({ setLoading, setEvents, events, selectedUser, setSelectedUser }) => {
-    const [users, setUsers] = useState([]);
-    const [originales, setOriginales] = useState(events);
+const isVisibleForVolunteer = (event, volunteer) => {
+    if (!event || !volunteer) return false;
+    if (event.organizerId === volunteer.id) return true;
+    if (event.participantMode === 'all') return true;
+    if (event.participantMode === 'volunteers') return (event.participantVolunteerIds || []).includes(volunteer.id);
+    if (event.participantMode === 'areas') {
+        return (event.participantAreaIds || []).some((areaId) => (volunteer.areaIds || []).includes(areaId));
+    }
+    return false;
+};
 
-    useEffect(() => {
-        fetchAllUsers();
-    }, []);
+const normalizeCalendarEvent = (event) => ({
+    ...event,
+    id: String(event.id),
+    title: event.title || 'Reunion',
+    start: event.start ? new Date(event.start) : undefined,
+    end: event.end ? new Date(event.end) : undefined,
+    allDay: Boolean(event.allDay),
+    backgroundColor: event.color || '#7CB3E9',
+    borderColor: event.color || '#7CB3E9',
+    textColor: event.textColor || '#ffffff',
+    extendedProps: {
+        organizerId: event.organizerId,
+        participantMode: event.participantMode,
+        participantVolunteerIds: event.participantVolunteerIds || [],
+        participantAreaIds: event.participantAreaIds || [],
+        link: event.link,
+        description: event.description
+    }
+});
 
-    const fetchAllUsers = async () => {
-        try {
-            const response = await axios.get('/datos/administrador/allUsers');
-            const data = response.data;
+const UserSelector = ({ events, sourceEvents, volunteers, selectedUser, setSelectedUser, setEvents }) => {
+    const options = useMemo(
+        () =>
+            volunteers.map((user) => ({
+                ...user,
+                displayName: user.username || user.email || `Voluntario ${user.id}`
+            })),
+        [volunteers]
+    );
 
-            const formattedUsers = [
-                ...data[0].map(user => ({
-                    ...user,
-                    displayName: user.username,
-                    role: 'Candidato'
-                })),
-                ...data[1].map(user => ({
-                    ...user,
-                    displayName: user.nombre || user.username,
-                    role: 'Paciente'
-                })),
-                ...data[2].map(user => ({
-                    ...user,
-                    displayName: user.nombre || user.username,
-                    role: 'Terapeuta'
-                })),
-            ];
-
-            setUsers(formattedUsers);
-        } catch (error) {
-        }
-    };
-
-    const handleUserSelect = async (event, newValue) => {
+    const handleUserSelect = (event, newValue) => {
         setSelectedUser(newValue);
-
-        if (newValue) {
-            const payload = {
-                role: newValue.role,
-                Id: newValue.id
-            };
-
-            try {
-                const response = await axios.patch('/reuniones/reunion_inicial/reuniones_all/', payload);
-
-                const eventos = response.data;
-
-                setEvents(eventos);
-                dispatch(getEvents(formattedEvents));
-
-            } catch (error) {
-            }
+        if (!newValue) {
+            setEvents(sourceEvents.map(normalizeCalendarEvent));
+            return;
         }
+        setEvents(sourceEvents.filter((calendarEvent) => isVisibleForVolunteer(calendarEvent, newValue)).map(normalizeCalendarEvent));
     };
 
     const handleResetCalendar = () => {
-        setSelectedUser(null);  // Limpia selección
-    
-        const formattedEvents = events.map(evento => ({
-            id: evento.id,
-            title: evento.title,
-            start: new Date(evento.start),
-            end: new Date(evento.end),
-            usuarioId: evento.usuarioId
-        }));
-    
-        setEvents(events); // Usa el prop
-        dispatch(getEvents(formattedEvents));
-    
+        setSelectedUser(null);
+        setEvents(sourceEvents.map(normalizeCalendarEvent));
     };
-    
 
     return (
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Autocomplete
                 value={selectedUser}
-                options={users}
-                getOptionLabel={(option) => `${option.displayName} (${option.role})`}
+                options={options}
+                getOptionLabel={(option) => option.displayName}
                 onChange={handleUserSelect}
-                renderInput={(params) => <TextField {...params} label="Seleccionar Usuario" variant="outlined" />}
-                isOptionEqualToValue={(option, value) => option.id === value.id && option.role === value.role}
-                sx={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="Filtrar por voluntario" variant="outlined" />}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                sx={{ width: { xs: '100%', sm: 320 } }}
             />
 
-            <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleResetCalendar}
-            >
-                <span>Volver a mi calendario</span>
+            <Button variant="contained" color="secondary" onClick={handleResetCalendar}>
+                Ver mi calendario
             </Button>
         </Stack>
     );

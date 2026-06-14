@@ -14,7 +14,7 @@ RUN pip install .
 EXPOSE 80
 
 # Runtime configuration is provided by compose.yml, .env, or the deploy platform.
-ENV DATABASE_NAME=45minutes
+ENV DATABASE_NAME=nucleus
 ENV ENV=dev
 ENV JWT_ALGORITHM=HS256
 ENV TEST=true

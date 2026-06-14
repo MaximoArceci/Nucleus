@@ -101,7 +101,7 @@ const MeetLinkDisplay = ({ link }) => {
 
 
 const getInitialValues = (event, range) => {
-    const { userId, role } = useAuth();
+    const { userId } = useAuth();
     let start = range ? new Date(range.start) : new Date();
     let end = new Date(start.getTime() + 45 * 60000);
 
@@ -135,7 +135,6 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
     const theme = useTheme();
     const isCreating = !event;
     const [errorMessage, setErrorMessage] = useState();
-    const { role } = useAuth();
     const EventSchema = Yup.object().shape({
         title: Yup.string().max(255).required('Se requiere un título'),
         description: Yup.string().max(5000),
@@ -208,7 +207,7 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
 
     const [tipoSeleccionado, setTipoSeleccionado] = useState(1);
     const { values, errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
-    const isDisabled = role === "Paciente" || role === "Candidato" || selectedUser !== null;;
+    const isDisabled = selectedUser !== null;
 
     return (
         <FormikProvider value={formik}>
@@ -231,72 +230,46 @@ const AddEventFrom = ({ event, range, handleDelete, handleCreate, handleUpdate, 
                             </Grid>
 
                             {/* Selección de usuario y Autocomplete */}
-                            {role === "Admin" ? (
-                                // FORMULARIO PARA ADMIN
-                                <Grid item xs={12}>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12} md={6}>
-                                            <FormControl fullWidth>
-                                                <InputLabel id="tipo-usuario-label">Tipo de Usuario</InputLabel>
-                                                <Select
-                                                    labelId="tipo-usuario-label"
-                                                    value={tipoSeleccionado}
-                                                    onChange={(event) => setTipoSeleccionado(event.target.value)}
+                            <Grid item xs={12}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} md={6}>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="tipo-usuario-label">Tipo de Usuario</InputLabel>
+                                            <Select
+                                                labelId="tipo-usuario-label"
+                                                value={tipoSeleccionado}
+                                                onChange={(event) => setTipoSeleccionado(event.target.value)}
+                                                disabled={isDisabled}
+                                            >
+                                                <MenuItem value={0}>Candidatos</MenuItem>
+                                                <MenuItem value={1}>Pacientes</MenuItem>
+                                                <MenuItem value={2}>Terapeutas</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6}>
+                                        <Autocomplete
+                                            options={obtenerListaPorTipo()}
+                                            getOptionLabel={(option) => option.username}
+                                            value={obtenerListaPorTipo().find((p) => p.id === values.guestId) || null}
+                                            onChange={(event, newValue) => {
+                                                setFieldValue('guestId', newValue ? newValue.id : null);
+                                                setFieldValue('tipoGuest', newValue ? newValue.role : '');
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    label="Seleccionar Usuario"
+                                                    error={Boolean(touched.guestId && errors.guestId)}
+                                                    helperText={touched.guestId && errors.guestId}
                                                     disabled={isDisabled}
-                                                >
-                                                    <MenuItem value={0}>Candidatos</MenuItem>
-                                                    <MenuItem value={1}>Pacientes</MenuItem>
-                                                    <MenuItem value={2}>Terapeutas</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-
-                                        <Grid item xs={12} md={6}>
-                                            <Autocomplete
-                                                options={obtenerListaPorTipo()}
-                                                getOptionLabel={(option) => option.username}
-                                                value={obtenerListaPorTipo().find((p) => p.id === values.guestId) || null}
-                                                onChange={(event, newValue) => {
-                                                    setFieldValue('guestId', newValue ? newValue.id : null);
-                                                    setFieldValue('tipoGuest', newValue ? newValue.role : '');
-                                                }}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        label="Seleccionar Usuario"
-                                                        error={Boolean(touched.guestId && errors.guestId)}
-                                                        helperText={touched.guestId && errors.guestId}
-                                                        disabled={isDisabled}
-                                                    />
-                                                )}
-                                            />
-
-                                        </Grid>
+                                                />
+                                            )}
+                                        />
                                     </Grid>
                                 </Grid>
-                            ) : role === "Terapeuta" ? (
-                                // FORMULARIO PARA TERAPEUTA (solo pacientes, ocupa todo el ancho)
-                                <Grid item xs={12}>
-                                    <Autocomplete
-                                        options={(pacientes || [])} // Solo muestra pacientes
-                                        getOptionLabel={(option) => option.username}
-                                        value={(pacientes || []).find((p) => p.id === values.guestId) || null}
-                                        onChange={(event, newValue) => {
-                                            setFieldValue('guestId', newValue ? newValue.id : null);
-                                            setFieldValue('tipoGuest', newValue ? newValue.role : '');
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Seleccionar Paciente"
-                                                error={Boolean(touched.guestId && errors.guestId)}
-                                                helperText={touched.guestId && errors.guestId}
-                                                disabled={isDisabled}
-                                            />
-                                        )}
-                                    />
-                                </Grid>
-                            ) : null}
+                            </Grid>
 
 
                             {/* Descripción */}

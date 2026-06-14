@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../../../../assets/images/landing/Logo-tipografico.png";
+import logo from "../../../../../assets/images/nucleus-logo.png";
 //import archessy from "@/assets/images/archessy.png";
 import archessy from "../../../../../assets/images/landing/archessy.webp";
 
@@ -10,7 +10,7 @@ function Footer() {
         {/* Logos */}
         <div className="flex items-center gap-8">
           <a href="/" className="w-40">
-            <img src={logo} alt="Company Logo" className="w-full" />
+            <img src={logo} alt="Nucleus" className="w-full" />
           </a>
 
 
@@ -28,7 +28,7 @@ function Footer() {
         {/* Copyright */}
         <div className="flex items-center justify-center md:justify-end gap-4">
           <p className="text-xs text-gray-400">
-            © 2023 – Company, Inc. Todos los derechos reservados.  
+            © 2026 – Nucleus. Todos los derechos reservados.  
           </p>
           <a href="#" className="w-40">
             <img src={archessy} alt="Logo Archessy" className="w-full" />

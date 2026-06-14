@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()  # Inicializa las variables de entorno
 
 main_app = FastAPI(
-    title="45Minutes API",
+    title="Nucleus API",
     version="0.1",
     debug=TEST,
 )

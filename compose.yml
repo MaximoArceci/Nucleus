@@ -6,7 +6,7 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_DATABASE=45minutes
+      - MONGO_INITDB_DATABASE=nucleus
     volumes:
       - mongo_data:/data/db
     networks:
@@ -27,7 +27,7 @@ services:
       - internal   
     command: bash -c 'pip install . ; python start.py --reload'
     environment:
-      - DATABASE_NAME=45minutes
+      - DATABASE_NAME=nucleus
       - DATABASE_URL=${DATABASE_URL:-mongodb://mongo:27017}
       - ENV=dev
       - JWT_SECRET=${JWT_SECRET}

@@ -29,7 +29,6 @@ import { getEvents, addEvent, updateEvent, removeEvent } from 'store/slices/cale
 // assets
 import AddAlarmTwoToneIcon from '@mui/icons-material/AddAlarmTwoTone';
 import axios from 'utils/axios';
-import { useAuth } from 'contexts/Auth0Context';
 import { EventAvailable } from '@mui/icons-material';
 import { Alert, Snackbar } from '@mui/material';
 import UserSelector from './UserSelector';
@@ -44,7 +43,6 @@ const Calendar = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const [loading, setLoading] = useState(true);
-    const { role } = useAuth();
     // fetch events data
     const [events, setEvents] = useState([]);
     const calendarState = useSelector((state) => state.calendar);
@@ -126,17 +124,10 @@ const Calendar = () => {
     useEffect(() => {
         const fetchPacientes = async () => {
             try {
-                if (role === "Admin") {
-                    const response = await axios.get("/datos/administrador/allUsers");
-                    setPacientes(response.data[1]);
-                    setCandidatos(response.data[0]);
-                    setTerapeutas(response.data[2]);
-                }
-                else {
-
-                    const response = await axios.get("/datos/candidato");
-                    setPacientes(response.data);
-                }
+                const response = await axios.get("/datos/administrador/allUsers");
+                setPacientes(response.data[1]);
+                setCandidatos(response.data[0]);
+                setTerapeutas(response.data[2]);
             } catch (error) {
             }
         };
@@ -248,27 +239,22 @@ const Calendar = () => {
             title="Gestion de sesiones"
             secondary={
                 <div>
-                    {role != "Admin" &&
-
-                        <Button
-                            color="secondary"
-                            variant="contained"
-                            onClick={handleReunion}
-                            sx={{ mr: 1 }} // Agrega margen izquierdo
-                        >
-                            <EventAvailable />
-                            Solicitar sesion
-                        </Button>
-                    }
-                    {(role == "Terapeuta" || role == "Admin") &&
-                        <Button
-                            color="secondary"
-                            variant="contained"
-                            onClick={handleAddClick}>
-                            <AddAlarmTwoToneIcon fontSize="small" sx={{ mr: 0.75 }} />
-                            Agregar sesion
-                        </Button>
-                    }
+                    <Button
+                        color="secondary"
+                        variant="contained"
+                        onClick={handleReunion}
+                        sx={{ mr: 1 }}
+                    >
+                        <EventAvailable />
+                        Solicitar sesion
+                    </Button>
+                    <Button
+                        color="secondary"
+                        variant="contained"
+                        onClick={handleAddClick}>
+                        <AddAlarmTwoToneIcon fontSize="small" sx={{ mr: 0.75 }} />
+                        Agregar sesion
+                    </Button>
                 </div>
             }
 
@@ -305,9 +291,7 @@ const Calendar = () => {
             </Snackbar>
 
             <CalendarStyled>
-                {role == "Admin" &&
-                    <UserSelector setLoading={setLoading} setEvents={setEvents} events={events}  selectedUser={selectedUser} setSelectedUser={setSelectedUser}/>
-                }
+                <UserSelector setLoading={setLoading} setEvents={setEvents} events={events}  selectedUser={selectedUser} setSelectedUser={setSelectedUser}/>
                 <Toolbar
                     date={date}
                     view={view}
@@ -320,11 +304,11 @@ const Calendar = () => {
                     <FullCalendar
                         locale={es}
                         weekends
-                        editable={role === "Admin" || role === "Terapeuta"} // Solo permite edición a Admin y Terapeuta
-                        eventStartEditable={false}  // Evita que se arrastre
-                        eventDurationEditable={role === "Admin" || role === "Terapeuta"} // Solo permite redimensionar si es Admin/Terapeuta
-                        droppable={role === "Admin" || role === "Terapeuta"}
-                        selectable={role === "Admin" || role === "Terapeuta"}
+                        editable
+                        eventStartEditable={false}
+                        eventDurationEditable
+                        droppable
+                        selectable
                         events={events}
                         ref={calendarRef}
                         rerenderDelay={10}
@@ -335,7 +319,7 @@ const Calendar = () => {
                         eventDisplay="block"
                         headerToolbar={false}
                         allDayMaintainDuration
-                        select={role === "Admin" || role === "Terapeuta" ? handleRangeSelect : null} // Solo permite seleccionar rangos a Admin/Terapeuta
+                        select={handleRangeSelect}
                         eventClick={handleEventSelect}
                         height={matchSm ? 'auto' : 720}
                         plugins={[listPlugin, dayGridPlugin, timelinePlugin, timeGridPlugin, interactionPlugin]}

@@ -18,7 +18,7 @@ function Terms() {
                 <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán publicados en esta página.</p>
 
                 <h2>Contacto</h2>
-                <p>Si tenés dudas sobre estos términos, contactanos en: 45minutesonline@gmail.com</p>
+                <p>Si tenés dudas sobre estos términos, contactanos en: contacto.local</p>
             </body>
         </html>
     )

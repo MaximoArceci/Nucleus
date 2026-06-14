@@ -43,7 +43,7 @@ function PrivacyPolicy() {
       <p>Podés revocar el acceso a tu cuenta de Google en cualquier momento desde: <a href="https://myaccount.google.com/permissions">https://myaccount.google.com/permissions</a></p>
     
       <h2>Contacto</h2>
-      <p>Si tenés preguntas o inquietudes sobre esta política, podés contactarnos en: 45minutesonline@gmail.com</p>
+      <p>Si tenés preguntas o inquietudes sobre esta política, podés contactarnos en: contacto.local</p>
     </body>
     </html>
   );

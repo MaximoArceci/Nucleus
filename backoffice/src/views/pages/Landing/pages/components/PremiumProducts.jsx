@@ -9,19 +9,19 @@ const productsData = [
     id: 1,
     title: "Procesos psicoanalíticos de pequeños grupos",
     description:
-      "Procesos psicoanalíticos de acompañamiento e intervención grupal. Con un objetivo definido y un tiempo acotado y consensuado, se dinamizan procesos para el logro de metas, la elaboración de crisis y la gestión de oportunidades. Las agrupaciones garantizan las relaciones interpersonales, el sostenimiento de las tradiciones culturales y la adquisición y el refinamiento de habilidades y funciones fundamentales para la vida. 45minutes.online ofrece un exclusivo modelo para tramitar acuerdos y desacuerdos, la conformación de ideas, la confrontación de perspectivas y la ejecución de proyectos.",
+      "Procesos psicoanalíticos de acompañamiento e intervención grupal. Con un objetivo definido y un tiempo acotado y consensuado, se dinamizan procesos para el logro de metas, la elaboración de crisis y la gestión de oportunidades. Las agrupaciones garantizan las relaciones interpersonales, el sostenimiento de las tradiciones culturales y la adquisición y el refinamiento de habilidades y funciones fundamentales para la vida. Nucleus ofrece un exclusivo modelo para tramitar acuerdos y desacuerdos, la conformación de ideas, la confrontación de perspectivas y la ejecución de proyectos.",
   },
   {
     id: 2,
     title: "Procesos psicoanalíticos de la Vocación y el Emprendimiento",
     description:
-      "Un espacio creativo para la realización y el reconocimiento, la elaboración de proyectos y la concreción de las oportunidades. Del contacto con el deseo de aprender o ejercer un oficio o una carrera, hasta el proceso de descubrimiento de una vocación cuando ya se posee una profesión consolidada, evocan las preguntas por la vocación y la capacidad de emprender. 45minuntes.online ofrece un modelo diseñado para la indagación en la naturaleza de esta experiencia, en concordancia con el reconocimiento de una cultura signada por novedosas tendencias, plataformas, dispositivos y oficios caracterizados por la aceleración y la fluidez.",
+      "Un espacio creativo para la realización y el reconocimiento, la elaboración de proyectos y la concreción de las oportunidades. Del contacto con el deseo de aprender o ejercer un oficio o una carrera, hasta el proceso de descubrimiento de una vocación cuando ya se posee una profesión consolidada, evocan las preguntas por la vocación y la capacidad de emprender. Nucleus ofrece un modelo diseñado para la indagación en la naturaleza de esta experiencia, en concordancia con el reconocimiento de una cultura signada por novedosas tendencias, plataformas, dispositivos y oficios caracterizados por la aceleración y la fluidez.",
   },
   {
     id: 3,
     title: "Consultoría psicoanalítica del liderazgo y la gestión",
     description:
-      "Un espacio exclusivo para abordar las complejidades de la mediación, la gestión y la innovación en un contexto ejecutivo y empresarial. El liderazgo, la negociación y la gestión requieren de una comunicación empática y eficaz que estimule la colaboración entre los integrantes de un equipo y el desarrollo de proyectos y tareas específicas. También requiere de la comprensión y abstracción de problemáticas que toman en cuenta las situaciones, contextos y potencialidades que se le asocian. Capacitados por nuestra experiencia con gerentes, empresarios y CEOs, 45minuntes.online ofrece fundamentos psicoanalíticos que consideran los intereses y actitudes del entorno empresarial, junto a las transformaciones que implican determinadas situaciones críticas que estimulan el cambio necesario de los miembros que componen el grupo.",
+      "Un espacio exclusivo para abordar las complejidades de la mediación, la gestión y la innovación en un contexto ejecutivo y empresarial. El liderazgo, la negociación y la gestión requieren de una comunicación empática y eficaz que estimule la colaboración entre los integrantes de un equipo y el desarrollo de proyectos y tareas específicas. También requiere de la comprensión y abstracción de problemáticas que toman en cuenta las situaciones, contextos y potencialidades que se le asocian. Capacitados por nuestra experiencia con gerentes, empresarios y CEOs, Nucleus ofrece fundamentos psicoanalíticos que consideran los intereses y actitudes del entorno empresarial, junto a las transformaciones que implican determinadas situaciones críticas que estimulan el cambio necesario de los miembros que componen el grupo.",
   }
 ];
 

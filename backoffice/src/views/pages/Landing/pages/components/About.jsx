@@ -28,7 +28,7 @@ function Products({ screen }) {
               </div>
 
               <h3 className="text-primary text-center md:w-1/2 text-lg sm:text-xl">
-                45minutes.online es el espacio para el despliegue de tu autenticidad.
+                Nucleus es el espacio para el despliegue de tu autenticidad.
               </h3>
 
               {/* Comillas derecha */}

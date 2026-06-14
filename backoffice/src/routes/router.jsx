@@ -16,7 +16,7 @@ import Terms from "views/pages/Landing/pages/components/Terms"
 
 const AppRouter = () => {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
-  const { isLoading, isProcessingAuth, isAuthenticated, role } = useAuth();
+  const { isLoading, isProcessingAuth, isAuthenticated } = useAuth();
   const toggleNavbar = () => setIsNavbarVisible((prev) => !prev);
 
   
@@ -69,15 +69,9 @@ const AppRouter = () => {
                 >
                   <Routes>
                     <Route path="/home" element={<Calendar />} />
-                    {role === "Admin" && (
-                      <>
-                        <Route path="/terapeuta" element={<Paciente />} />
-                        <Route path="/candidato" element={<Paciente />} />
-                      </>
-                    )}
-                    {(role === "Admin" || role === "Terapeuta") && (
-                      <Route path="/paciente" element={<Paciente />} />
-                    )}
+                    <Route path="/terapeuta" element={<Paciente />} />
+                    <Route path="/candidato" element={<Paciente />} />
+                    <Route path="/paciente" element={<Paciente />} />
                     <Route path="*" element={<Navigate to="/home" replace />} />
                   </Routes>
                 </div>

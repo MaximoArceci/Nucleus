@@ -7,8 +7,8 @@ import Stack from '@mui/material/Stack';
 
 const AuthFooter = () => (
     <Stack direction="row" justifyContent="space-between">
-        <Typography variant="subtitle2" component={Link} href="https://45minutes.com" target="_blank" underline="hover">
-            45minutes.com
+        <Typography variant="subtitle2" component={Link} href="/" underline="hover">
+            Nucleus
         </Typography>
         {/* <Typography variant="subtitle2" component={Link} href="https://codedthemes.com" target="_blank" underline="hover">
             &copy; codedthemes.com

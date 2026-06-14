@@ -11,7 +11,7 @@ function Home({ screen }) {
         {/* Texto principal */}
         <div className="relative z-10 w-full max-w-[90%] sm:max-w-[70%] lg:w-1/3">
           <h2 className="text-2xl sm:text-3xl md:text-4xl text-center">
-            ¿Dispones de un tiempo para la introspección?
+            Nucleus organiza reuniones, áreas y tareas para los voluntarios de Nucleate.
           </h2>
         </div>
 

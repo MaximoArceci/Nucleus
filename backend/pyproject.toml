@@ -1,7 +1,7 @@
 [project]
-name = "45-minutes-online"
+name = "nucleus"
 version = "0.1.1"
-description = "API para 45minutes online"
+description = "API para Nucleus"
 authors = [
 	{ name = "Tiziano Musca"},
 ]
